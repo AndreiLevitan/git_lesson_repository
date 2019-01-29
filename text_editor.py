@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QFileDialog
-from PyQt5.QtGui import QPixmap
 import sys
+import shutil
 
 
 class Ui_MainWindow(object):
@@ -51,21 +51,31 @@ class Ui_MainWindow(object):
 class TextEditor(Ui_MainWindow, QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setupUi()
+        self.setupUi(self)
         self.load_btn.clicked.connect(self.load_form)
         self.save_btn.clicked.connect(self.save_form)
         self.create_new_btn.clicked.connect(self.create_form)
+        self.file_path = ''
+
+    def get_case(self):
+        case = self.editor.toPlainText()
+        return case
 
     def load_form(self):
-        pass
+
+        self.file_path = QFileDialog.getOpenFileName(self, 'Выбрать файл')[0]
+        with open(self.file_path, mode='r') as file:
+            self.editor.setText(file.read())
 
     def save_form(self):
-        pass
+        if self.file_path:
+            self.save_path = QFileDialog.getSaveFileName(self, 'Сохранить файл', 'untitled.txt', "text (*.txt)")[0]
+            shutil.copy(self.file_path, self.save_path + '.txt')
+            with open(self.save_path, mode='r', encoding='utf-8') as file:
+                file.write(self.get_case())
 
     def create_form(self):
         pass
-
-
 
 
 if __name__ == '__main__':
