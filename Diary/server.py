@@ -110,6 +110,12 @@ class NewsModel:
         cursor.close()
         self.connection.commit()
 
+    def clean(self):
+        cursor = self.connection.cursor()
+        cursor.execute("DELETE FROM news")
+        cursor.close()
+        self.connection.commit()
+
 
 class User:
     def __init__(self, login, password, model):
@@ -135,7 +141,8 @@ def login():
 @app.route('/feed', methods=['POST', 'GET'])
 def feed():
     if request.method == 'GET':
-        return """1"""
+        cur_user_news = news.get_all(user_id=85)
+        return render_template('feed.html', news=cur_user_news)
     elif request.method == 'POST':
         pass
 
@@ -143,10 +150,18 @@ def feed():
 if __name__ == '__main__':
     database = DB()
     users = UsersModel(database.get_connection())
-    users.init_table()
-    users.clean()
-    users.insert('Andrey', '12345678')
-    users.insert('ProGamer', '13371212')
-    users.insert('Nastenka', 'qwerty')
+    # users.init_table()
+    # users.clean()
+    # users.insert('Andrey', '12345678')
+    # users.insert('ProGamer', '13371212')
+    # users.insert('Nastenka', 'qwerty')
+    print(users.get_all())
+
+    news = NewsModel(database.get_connection())
+    # news.init_table()
+    # news.clean()
+    news.insert('Вред сотовых телефонов', 'Сотовые телефоны вредны', 85)
+    news.insert('Вред сотовых телефо1нов', 'Сотовые те1лефоны вредны', 85)
+    news.insert('Вред сот11овых телефонов', 'Сотовые телефо11ны вредны', 85)
     app.run(port=8000, host='127.0.0.1')
 
